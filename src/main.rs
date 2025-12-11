@@ -23,9 +23,9 @@ enum Commands {
         #[arg(short, long)]
         input: PathBuf,
 
-        /// Path to output CSV file
+        /// Path to output CSV file (defaults to input file with .csv extension)
         #[arg(short, long)]
-        output: PathBuf,
+        output: Option<PathBuf>,
     },
 }
 
@@ -51,8 +51,12 @@ fn main() {
 fn handle_convert(
     report_type: ReportType,
     input: PathBuf,
-    output: PathBuf,
+    output: Option<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    // Generate output path if not provided
+    let output = output.unwrap_or_else(|| {
+        input.with_extension("csv")
+    });
     // Parse XLSX to Vec<Vec<String>>
     let rows = converters::parse_xlsx(&input)?;
 
